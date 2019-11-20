@@ -18,7 +18,7 @@ class CreateSocialsTable extends Migration
             $table->boolean('status')->default(1);
             $table->string('name')->nullable();
             $table->string('link')->nullable();
-            $table->string('logo')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

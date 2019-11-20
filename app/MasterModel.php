@@ -12,7 +12,7 @@ class MasterModel extends Model
     }
     protected $model;         // model name
     protected $route;         // route name
-    protected $index_fields;    //model response for mobile
+    protected $index_fields;  //model response for mobile
 
     public function setImageAttribute()
     {
