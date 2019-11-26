@@ -16,18 +16,18 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->enum('type' , ['user' , 'provider'])->default('user');
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('mobile')->unique();
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('apiToken')->nullable();
             $table->json('device_token')->nullable();
-            $table->boolean('status')->default(1);
+            $table->boolean('status')->default(0);
             $table->boolean('notify')->default(1);
             $table->string('image')->nullable();
-            $table->string('activation_code')->nullable();
+            $table->integer('activation_code')->nullable();
             $table->enum('device_type' , ['android' , 'ios'])->default('ios');
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

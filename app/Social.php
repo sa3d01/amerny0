@@ -6,16 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Social extends MasterModel
 {
-    public function __construct(Social $model)
+    public function scopeActive($query)
     {
-        $this->model = $model;
-        $this->route = 'social';
-        parent::__construct();
+        $query->where('status', 1);
     }
     protected $fillable = [
         'image','name','link', 'status',
     ];
     protected $index_fields  = [
-        'id','link','name','image', 'status'
+        'link','name'
     ];
 }

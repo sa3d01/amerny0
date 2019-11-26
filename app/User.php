@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use phpDocumentor\Reflection\Types\Object_;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -48,7 +48,7 @@ class User extends Authenticatable
         if(request()->hasFile('image')){
             $file = request()->file('image');
             $destinationPath = 'images/user/';
-            $filename = str_random(10).'.'.$file->getClientOriginalExtension();
+            $filename = Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move($destinationPath, $filename);
             $this->attributes['image'] = $filename;
         }
@@ -69,7 +69,7 @@ class User extends Authenticatable
         }
     }
 
-    protected $index_fields  = ['id','name','type','mobile', 'email','image','activation_code','status','apiToken'];
+    protected $index_fields  = ['id','name','type','mobile', 'email','image','activation_code','status','notify','apiToken'];
 
     public function static_model()
     {
@@ -77,7 +77,19 @@ class User extends Authenticatable
         foreach ($this->index_fields as $index_field){
             $this->$index_field ? $arr[$index_field] = $this->$index_field : null;
         }
+        if($this->saved_places){
+            $data=[];
+            foreach ($this->saved_places as $saved_place){
+                $arrs=$saved_place->static_model();
+                $data[]=$arrs;
+            }
+            $arr['saved_places']=$data;
+        }
         return $arr;
+    }
+    public function saved_places()
+    {
+        return $this->hasMany(SavedPlaces::class, 'user_id', 'id');
     }
 
 }

@@ -22,6 +22,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['prefix' => 'v1'], function () {
+    Route::post('user/login', 'Api\UserController@login');
+    Route::post('user/resend_code', 'Api\UserController@resend_code');
+    Route::post('user/activate', 'Api\UserController@activate');
+    Route::post('user/update', 'Api\UserController@update_profile');
+    Route::post('user/save_place', 'Api\UserController@save_place');
     Route::resource('user', 'Api\UserController');
     Route::resource('category', 'Api\CategoryController');
+
+    Route::get('setting', 'Api\SettingController@setting');
+
 });
