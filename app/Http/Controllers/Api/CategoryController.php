@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Category;
+use App\Service;
+use App\User;
 use Illuminate\Http\Request;
 
 class CategoryController extends MasterController
@@ -15,18 +17,55 @@ class CategoryController extends MasterController
     }
     public function index(Request $request)
     {
-        //auth
-        $check_token=$this->check_apiToken($request->header('apiToken'));
-        if($check_token){
-            return $check_token;
-        }
-        //auth
         $rows = $this->model->where('parent_id',null)->active()->latest()->get();
         $data=[];
         foreach ($rows as $row){
             $arr=$row->static_model();
+            $count_services=0;
+            foreach ($row->child as $item){
+                $count_services+=count($item->services);
+            }
+            $arr['services_count']=$count_services;
             $data[]=$arr;
         }
         return response()->json(['status' => 200,'data'=>$data]);
     }
+    public function show($id, Request $request)
+    {
+        $row = $this->model->find($id);
+        if (!$row) {
+            return response()->json(['status' => 400,'msg'=>'something happened']);
+        }
+        $base_category_obj=$row->static_model();
+        $sub_categories=[];
+        foreach ($row->child as $child){
+            $sub_category_obj=$child->static_model();
+            $services=[];
+            foreach ($child->services as $service){
+                $services[]=$service->static_model();
+            }
+            $sub_category_obj['services']=$services;
+            $sub_categories[]=$sub_category_obj;
+        }
+        $base_category_obj['sub_categories']=$sub_categories;
+        return response()->json(['status' => 200, 'data' => $base_category_obj]);
+    }
+    public function search($id,Request $request)
+    {
+        $row = $this->model->find($id);
+        if (!$row) {
+            return response()->json(['status' => 400,'msg'=>'something happened']);
+        }
+        $sub_categories_id=Category::where('parent_id',$id)->pluck('id');
+        $services=Service::whereIn('category_id',$sub_categories_id)->where('name->ar', 'LIKE', '%'.$request['name'].'%')
+            ->orWhere('name->en', 'LIKE', '%'.$request['name'].'%')
+            ->get();
+        $data=[];
+        foreach ($services as $service){
+            $arr=$service->static_model();
+            $data[]=$arr;
+        }
+        return response()->json(['status' => 200, 'data' => $data]);
+    }
+
 }

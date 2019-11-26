@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\SavedPlaces;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends MasterController
+class UserController extends Controller
 {
-    public function __construct(User $model)
-    {
-        $this->model = $model;
-        $this->route = 'user';
-        parent::__construct();
-    }
+
     public function validation_rules($method,$id=null)
     {
         if($method==2){
@@ -57,7 +53,7 @@ class UserController extends MasterController
                     return response()->json(['status' => 400, 'msg' =>$validator->errors()->first()]);
                 }
                 $all['activation_code']=$activation_code;
-                $user=$this->model->create($all);
+                $user=User::create($all);
             }else{
                 $user->update(['activation_code'=>$activation_code]);
             }
@@ -90,11 +86,6 @@ class UserController extends MasterController
     }
     public function activate(Request $request)
     {
-        //auth
-        $check_token=$this->check_apiToken($request->header('apiToken'));
-        if($check_token){
-            return $check_token;
-        }
         $split = explode("sa3d01",$request->header('apiToken'));
         $user=User::where('apiToken',$split['1'])->first();
         if(!$request['activation_code'] || ($user->activation_code!=$request['activation_code'])){
@@ -106,11 +97,6 @@ class UserController extends MasterController
     }
     public function save_place(Request $request)
     {
-        //auth
-        $check_token=$this->check_apiToken($request->header('apiToken'));
-        if($check_token){
-            return $check_token;
-        }
         $split = explode("sa3d01",$request->header('apiToken'));
         $user=User::where('apiToken',$split['1'])->first();
         $validate = Validator::make($request->all(), ['lat' => 'required','lng' => 'required','address' => 'required','title' => 'required']);
@@ -132,13 +118,8 @@ class UserController extends MasterController
     }
     public function update_profile(Request $request)
     {
-        $check_token=$this->check_apiToken($request->header('apiToken'));
-        if($check_token){
-            return $check_token;
-        }
         $split = explode("sa3d01",$request->header('apiToken'));
         $user=User::where('apiToken',$split['1'])->first();
-        //auth
         $validator = Validator::make($request->all(),$this->validation_rules(2,$user->id),$this->validation_messages());
         if ($validator->passes()) {
             $all=$request->all();
@@ -148,5 +129,12 @@ class UserController extends MasterController
         }else{
             return response()->json(['status' => 400, 'msg' =>$validator->errors()->first()]);
         }
+    }
+    public function show($id, Request $request)
+    {
+        $row = User::find($id);
+        if (!$row)
+            return response()->json(['status' => 400,'msg'=>'something happen']);
+        return response()->json(['status' => 200, 'data' => $row->static_model()]);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Middleware\CheckApiToken;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,10 +25,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'v1'], function () {
     Route::post('user/login', 'Api\UserController@login');
     Route::post('user/resend_code', 'Api\UserController@resend_code');
-    Route::post('user/activate', 'Api\UserController@activate');
-    Route::post('user/update', 'Api\UserController@update_profile');
-    Route::post('user/save_place', 'Api\UserController@save_place');
-    Route::resource('user', 'Api\UserController');
+
+    Route::post('user/activate', 'Api\UserController@activate')->middleware(CheckApiToken::class);
+    Route::post('user/update', 'Api\UserController@update_profile')->middleware(CheckApiToken::class);
+    Route::post('user/save_place', 'Api\UserController@save_place')->middleware(CheckApiToken::class);
+    Route::get('user/{id}', 'Api\UserController@show')->middleware(CheckApiToken::class);
+
+    Route::get('shift', 'Api\OrderController@shifts');
+
+    Route::post('category/{id}/search', 'Api\CategoryController@search');
     Route::resource('category', 'Api\CategoryController');
 
     Route::get('setting', 'Api\SettingController@setting');
