@@ -7,6 +7,7 @@ use App\SavedPlaces;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -32,6 +33,10 @@ class UserController extends Controller
             'mobile.required'=>'يجب ادخال رقم الهاتف',
         );
         return $messsages;
+    }
+    public function update_apiToken($user)
+    {
+        $user->update(['apiToken'=>Str::random(80)]);
     }
     public function login(Request $request)
     {

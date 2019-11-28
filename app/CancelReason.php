@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CancelReason extends MasterModel
 {
-
     protected $fillable = [
         'name', 'status',
     ];

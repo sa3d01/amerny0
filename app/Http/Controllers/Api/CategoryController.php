@@ -18,7 +18,7 @@ class CategoryController extends MasterController
     public function index(Request $request)
     {
         $rows = $this->model->where('parent_id',null)->active()->latest()->get();
-        $data=[];
+        $categories=[];
         foreach ($rows as $row){
             $arr=$row->static_model();
             $count_services=0;
@@ -26,9 +26,11 @@ class CategoryController extends MasterController
                 $count_services+=count($item->services);
             }
             $arr['services_count']=$count_services;
-            $data[]=$arr;
+            $categories[]=$arr;
         }
-        return response()->json(['status' => 200,'data'=>$data]);
+        $response['categories']=$categories;
+        $response['offers']=[];
+        return response()->json(['status' => 200,'data'=>$response]);
     }
     public function show($id, Request $request)
     {
@@ -40,15 +42,24 @@ class CategoryController extends MasterController
         $sub_categories=[];
         foreach ($row->child as $child){
             $sub_category_obj=$child->static_model();
-            $services=[];
-            foreach ($child->services as $service){
-                $services[]=$service->static_model();
-            }
-            $sub_category_obj['services']=$services;
             $sub_categories[]=$sub_category_obj;
         }
         $base_category_obj['sub_categories']=$sub_categories;
         return response()->json(['status' => 200, 'data' => $base_category_obj]);
+    }
+    public function services($id)
+    {
+        $row = $this->model->find($id);
+        if (!$row) {
+            return response()->json(['status' => 400,'msg'=>'something happened']);
+        }
+        $services=Service::where('category_id',$id)->active()->latest()->get();
+        $data=[];
+        foreach ($services as $service){
+            $arr=$service->static_model();
+            $data[]=$arr;
+        }
+        return response()->json(['status' => 200, 'data' => $data]);
     }
     public function search($id,Request $request)
     {

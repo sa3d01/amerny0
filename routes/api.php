@@ -33,6 +33,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('shift', 'Api\OrderController@shifts');
 
+    Route::get('category/{id}/services', 'Api\CategoryController@services');
     Route::post('category/{id}/search', 'Api\CategoryController@search');
     Route::resource('category', 'Api\CategoryController');
 
