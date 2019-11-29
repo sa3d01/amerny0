@@ -67,8 +67,7 @@ class CategoryController extends MasterController
         if (!$row) {
             return response()->json(['status' => 400,'msg'=>'something happened']);
         }
-        $sub_categories_id=Category::where('parent_id',$id)->pluck('id');
-        $services=Service::whereIn('category_id',$sub_categories_id)->where('name->ar', 'LIKE', '%'.$request['name'].'%')
+        $services=Service::where('category_id',$id)->where('name->ar', 'LIKE', '%'.$request['name'].'%')
             ->orWhere('name->en', 'LIKE', '%'.$request['name'].'%')
             ->get();
         $data=[];
