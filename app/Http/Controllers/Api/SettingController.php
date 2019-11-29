@@ -15,17 +15,12 @@ class SettingController extends Controller
     public function setting(Request $request)
     {
         $setting=Setting::first();
-        $socials=[];
-        $social=Social::active()->get();
         $row['about']=$setting->about['ar'];
         $row['mobile']=$setting->mobile;
         $row['email']=$setting->email;
-        foreach ($social as $item){
-            $arr=$item->static_model();
-            $socials[]=$arr;
-        }
-        $row['socials']=$socials;
-
+        $row['facebook']=Social::where('name','facebook')->value('link');
+        $row['twitter']=Social::where('name','twitter')->value('link');
+        $row['insta']=Social::where('name','insta')->value('link');
         return response()->json(['status' => 200, 'data' => $row]);
     }
 }
