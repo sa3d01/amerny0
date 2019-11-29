@@ -14,6 +14,10 @@ class SettingController extends Controller
 {
     public function setting(Request $request)
     {
+
+
+
+
         $setting=Setting::first();
         $row['about']=$setting->about['ar'];
         $row['mobile']=$setting->mobile;
